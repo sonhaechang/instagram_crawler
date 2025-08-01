@@ -226,8 +226,8 @@ pyshellIpcRendererChannels.forEach(channel => {
 const getCurrentOsPythonPath = () => {
 	if (os.platform() === 'win32') {
 		return isDev ? 
-		path.join(__dirname, '/../backend/venv/python.exe') : 
-		path.join(process.resourcesPath, 'backend/venv/python.exe');
+		path.join(__dirname, '/../backend/venv/Scripts/python.exe') : 
+		path.join(process.resourcesPath, 'backend/venv/Scripts/python.exe');
 	}
 	
 	return isDev ? 
