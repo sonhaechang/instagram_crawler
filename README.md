@@ -32,7 +32,9 @@ ex) [검색한 해쉬태그]_[날짜].xlsx의 tag_name이라는 sheet에 저장�
    - Windows와 Mac OS 설치 파일은 다운받아 사용하시면됩니다.
    - Linux의 경우 지원하지 않습니다. (추후 지원 예정)
 
-   [설치 파일 다운로드](/)
+   [Window 다운로드]()
+
+   [MacOS 다운로드]()
 
 2. 프로그램을 실행하면 Downloads/instagram_crawler 경로에 파일들이 생성됩니다.
     - driver: 크롬드라이버
@@ -69,17 +71,27 @@ ex) [검색한 해쉬태그]_[날짜].xlsx의 tag_name이라는 sheet에 저장�
 
 2. `cd instagram_crawler`
 
-3. `conda create -p ./backend/venv python=3.9`   
-instagram_crawler project안에 backend 폴더에 가상환경 생성  
+3. instagram_crawler project안에 backend 폴더에 가상환경 생성  
+    - **conda로 가상환경을 생성해도 되지만 venv로 가상환경 생성을 추천**
+
+    - MacOS는 `python -m venv ./backend/venv` or `conda create -p ./backend/venv python=3.9`
+
+    - Window는 `python -m venv .\backend\venv` or `conda create -p .\backend\venv python=3.9`
 
     - 만약 python 다른 버전을 사용하고 싶다면 사용할 버전으로 설치 (3.9로 사용하는걸 권장)  
+
     - instagram_crawler/public/electron.ts의 getCurrentOsPythonPath에 python3.x를 설치한 python 버전에 맞춰서 수정 (윈도우의 경우 불필요)
 
-4. `conda activate ./backend/venv`
+4. `source venv/bin/activate` or `conda activate ./backend/venv`
+    - 윈도우의 경우 venv로 생성한 가상 환경 활성화 명령어의 경우 아래의 명령어를 이용
+    - PowerShell에서 `.\backend\venv\Scripts\Activate.ps1`
+    - cmd에서 `.\backend\venv\Scripts\activate.bat`
 
-5. `pip install -r requirements.txt`
+5. `python -m pip install --upgrade pip` or `python -m pip install --upgrade pip`
 
-6. `npm install`
+6. `pip install -r ./backend/requirements.txt` or `pip install -r .\backend\requirements.txt`
+
+7. `npm install`
 
 ## Starting Development
 
