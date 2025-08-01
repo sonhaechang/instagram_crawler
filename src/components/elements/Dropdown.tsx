@@ -125,8 +125,6 @@ export default function Dropdown({
                     ring-black 
                     ring-opacity-5 
                     focus:outline-none
-                    
-                    overflow-scroll
                     ${
                         isScroll ? 
                         `
