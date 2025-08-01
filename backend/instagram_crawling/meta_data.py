@@ -12,9 +12,12 @@ else:
 BASE_DIR = os.path.join(os.path.expanduser('~'), *parts)
 BASE_DRIVER_DIR = os.path.join(BASE_DIR, 'driver')
 BINARY_FILE_PATH = 'Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing' \
-    if platform.system() == 'Darwin' else 'chrome.exe'
+    if platform.system() == 'Darwin' else 'chrome/chrome.exe'
 BINARY_DIR = os.path.join(BASE_DRIVER_DIR, BINARY_FILE_PATH)
-DRIVER_DIR = os.path.join(BASE_DRIVER_DIR, 'chromedriver')
+DRIVER_DIR = os.path.join(
+    BASE_DRIVER_DIR, 
+    'chromedriver' if platform.system() == 'Darwin' else 'chromedriver.exe'
+)
 CRAWLING_RESULT_DIR = os.path.join(BASE_DIR, 'crawling_results')
 BASE_PROFILE_DIR = os.path.join(BASE_DIR, '.chrome_profiles')
 BLACK_LIST_DIR = os.path.join(BASE_DIR, 'black_list')
