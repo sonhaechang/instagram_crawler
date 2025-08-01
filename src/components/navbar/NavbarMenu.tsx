@@ -142,7 +142,7 @@ export default function NavbarMenu({
 
     const dropDowns = [
         {title: '파일', width: 'w-80', menus: fileMenus}, 
-        {title: '보기', menus: viewMenus}, 
+        {title: '보기', width: 'w-80', menus: viewMenus}, 
         {title: '창', menus: windowMenus}, 
         {title: '도움말', menus: helpMenus}
     ];
