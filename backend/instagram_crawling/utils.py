@@ -105,6 +105,7 @@ def instagram_login(command_queue, response_queue) -> Driver:
 		driver = Driver(profile_path)
 		driver.start(LOGIN_URL if is_first_login else BASE_URL)
 	except:
+		traceback.print_exc()
 		response_queue.put({
 			'status': 500, 
 			'channel': 'driverStart',
