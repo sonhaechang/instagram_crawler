@@ -1,5 +1,6 @@
 import { JSX, useContext, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { CgSpinner } from 'react-icons/cg';
 import SearchHashtag from './SearchHashtag';
 import SelectFile from './SelectFile';
 import { Button } from '../../elements';
@@ -17,11 +18,15 @@ export default function SelectResult(): JSX.Element {
     const [fileName, setFileName] = useState<string>('');
 
     const ipcRendererListener = (e: any, args: any) => {
+        console.log(args);
         if (args.status === 200) {
-            navigate('/extract');
+            setIsLoading(false);
+
+            if (args.data) navigate('/extract');
+            else navigate('/select-option');
         } else {
             setType('error');
-            setMessage(args.data)
+            setMessage(args.data);
             setIsOpen(true);
             setIsLoading(false);
         }
@@ -57,7 +62,20 @@ export default function SelectResult(): JSX.Element {
 
             ipcRenderer.once('fileName', ipcRendererListener);
         }
-    }
+    };
+
+    const onGoBack = () => {
+        setIsLoading(true);
+
+        const channelName = selected_option === '1' ? 'hashtag' : 'fileName';
+
+        ipcRenderer.send(
+            channelName, 
+            JSON.stringify({channel: channelName, data: 'goBack'})
+        );
+
+        ipcRenderer.once(channelName, ipcRendererListener);
+    } 
 
     return (
         <>
@@ -117,12 +135,52 @@ export default function SelectResult(): JSX.Element {
                 '
             >
                 <Button 
-                    title='이전'
-                    onClick={() => navigate('/select-option')}
+                    title={
+                        <div 
+                            className='
+                                flex
+                                items-center
+                                justify-center
+                            '
+                        >
+                            {isLoading && (
+                                <CgSpinner 
+                                    className='
+                                        animate-spin
+                                        h-5 
+                                        w-5 
+                                        mr-3 
+                                    ' 
+                                />
+                            )}
+                            이전
+                        </div>
+                    }
+                    onClick={onGoBack}
                 />
            
                 <Button 
-                    title='다음'
+                    title={
+                        <div 
+                            className='
+                                flex
+                                items-center
+                                justify-center
+                            '
+                        >
+                            {isLoading && (
+                                <CgSpinner 
+                                    className='
+                                        animate-spin
+                                        h-5 
+                                        w-5 
+                                        mr-3 
+                                    ' 
+                                />
+                            )}
+                            다음
+                        </div>
+                    }
                     btnClass='
                         bg-indigo-600 
                         text-white 

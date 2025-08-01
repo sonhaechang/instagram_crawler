@@ -26,62 +26,89 @@ class InstagramCrawler:
 		self.response_queue = response_queue
 		
 	def main_process(self) -> None:
+		is_start = True
+
 		while True:
 			msg = self.command_queue.get()
 
 			if msg['channel'] == 'hashtag':
+				if msg['data'] == 'goBack':
+					is_start = False
+
 				self.hashtag = msg['data']
 				break
 
-		search_hashtag(self.driver.instance, self.hashtag)	
-		time.sleep(5)
+		if is_start:
+			search_hashtag(self.driver.instance, self.hashtag)	
+			time.sleep(5)
 
-		# print('\n인스타그램 크롤링(게시글 url 저장 및 해쉬태그 저장)을 시작합니다. \n')
+			# print('\n인스타그램 크롤링(게시글 url 저장 및 해쉬태그 저장)을 시작합니다. \n')
 
-		self.response_queue.put({
-			'status': 200, 
-			'channel': 'hashtag',
-		})
+			self.response_queue.put({
+				'status': 200, 
+				'channel': 'hashtag',
+				'data': True,
+			})
 
-		start_time = time.time()
-		file_path = self.extract_handler.collect_all_post_urls(
-			self.hashtag, 
-			start_time
-		)
-
-		if file_path is not None:
-			self.extract_handler.collect_all_hashtags(
-				self.file_name, 
-				self.ectract, 
-				start_time, 
-				file_path
+			start_time = time.time()
+			file_path = self.extract_handler.collect_all_post_urls(
+				self.hashtag, 
+				start_time
 			)
-		
-		# print('인스타그램 크롤링(게시글 url 저장 및 해쉬태그 저장)이 완료되었습니다. \n')
+
+			if file_path is not None:
+				self.extract_handler.collect_all_hashtags(
+					self.file_name, 
+					self.ectract, 
+					start_time, 
+					file_path
+				)
+			
+			# print('인스타그램 크롤링(게시글 url 저장 및 해쉬태그 저장)이 완료되었습니다. \n')
+		else:
+			self.response_queue.put({
+				'status': 200, 
+				'channel': 'hashtag',
+				'data': False,
+			})
+
 
 	def sub_process(self) -> None:		
+		is_start = True
+
 		# print('\n인스타그램 크롤링(게시글 url을 이용한 해쉬태그 저장)을 시작합니다. \n')
 
 		while True:
 			msg = self.command_queue.get()
 
 			if msg['channel'] == 'fileName':
+				if msg['data'] == 'goBack':
+					is_start = False
+
 				self.file_name = msg['data']
 				break
 
-		self.response_queue.put({
-			'status': 200, 
-			'channel': 'fileName',
-		})
+		if is_start:	
+			self.response_queue.put({
+				'status': 200, 
+				'channel': 'fileName',
+				'data': True,
+			})
 
-		start_time = time.time()
-		self.extract_handler.collect_all_hashtags(
-			self.file_name, 
-			self.ectract, 
-			start_time
-		)
+			start_time = time.time()
+			self.extract_handler.collect_all_hashtags(
+				self.file_name, 
+				self.ectract, 
+				start_time
+			)
 		
-		# print('인스타그램 크롤링(해쉬태그 저장)이 완료되었습니다. \n')
+			# print('인스타그램 크롤링(해쉬태그 저장)이 완료되었습니다. \n')
+		else:
+			self.response_queue.put({
+				'status': 200, 
+				'channel': 'fileName',
+				'data': False,
+			})
 
 
 	def start(self) -> None:
