@@ -61,7 +61,7 @@ export default function Home(): JSX.Element {
             >
                 <p>크롤링을 시작 할려면 chromedriver가 필요합니다.</p>
                 <p>
-                    본인이 사용하는 Chrome 버전을 확인 후 동일한 버전의 chromer과 chromedriver를 
+                    본인이 사용하는 Chrome 버전을 확인 후 chrome과 chromedriver를 
                     <span 
                         className='
                             pl-1
@@ -74,6 +74,10 @@ export default function Home(): JSX.Element {
                     </span>
                     에 설치해 주세요.
                 </p>
+                <p>chrome은 다운받아 압축 해제 후 폴더 이름을 chrome으로해서 통째로 옮겨주세요.</p>
+
+                <br />
+
                 <p>해당 프로그램은 Chrome 버전 115 이상만을 지원합니다. </p>
                 <p>Chrome 버전 115 이하는 Chrome 버전을 업데이트 후 사용해주세요.</p>
             </div>
@@ -85,6 +89,7 @@ export default function Home(): JSX.Element {
                     text-indigo-600 
                     text-sm 
                     cursor-pointer
+                    inline-block
                 '
                 onClick={onChromedriverDownload}
             >

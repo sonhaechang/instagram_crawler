@@ -1,5 +1,4 @@
 import { JSX, useContext, useEffect, useRef, useState } from 'react';
-
 import { CgSpinner } from 'react-icons/cg';
 import { Button } from '../elements';
 import { useNavigate } from 'react-router-dom';
@@ -190,7 +189,7 @@ export default function Extract(): JSX.Element {
                 {isFinish || isStop ? (
                     <>
                         <Button 
-                            title='크롤링 옵션 선택 페이지로'
+                            title='옵션 선택 페이지로'
                             onClick={() => navigate('/select-option')}
                         />
 

@@ -1,5 +1,6 @@
 import { JSX, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CgSpinner } from 'react-icons/cg';
 import { Button, Radio } from '../elements';
 import { AlertContext } from '../../providers/AlertProvider';
 
@@ -103,7 +104,27 @@ export default function SelectOption(): JSX.Element {
                 '
             >
                 <Button
-                    title='다음'
+                    title={
+                        <div 
+                            className='
+                                flex
+                                items-center
+                                justify-center
+                            '
+                        >
+                            {isLoading && (
+                                <CgSpinner 
+                                    className='
+                                        animate-spin
+                                        h-5 
+                                        w-5 
+                                        mr-3 
+                                    ' 
+                                />
+                            )}
+                            다음
+                        </div>
+                    }
                     btnClass='
                         bg-indigo-600 
                         text-white 
