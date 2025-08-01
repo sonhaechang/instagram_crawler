@@ -1,0 +1,121 @@
+{
+  "name": "instagram_crawler",
+  "description": "Instagram crawler application",
+  "homepage": "./",
+  "author": "shc5529",
+  "license": "MIT",
+  "version": "0.1.0",
+  "main": "./public/electron.js",
+  "private": true,
+  "dependencies": {
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.126",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "electron-is-dev": "^3.0.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-icons": "^4.10.1",
+    "react-router-dom": "^7.7.1",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.9.5",
+    "web-vitals": "^2.1.4"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "cross-env": "^10.0.0",
+    "electron": "^37.2.4",
+    "electron-builder": "^24.6.4",
+    "react-app-rewired": "^2.2.1",
+    "tailwindcss": "^3.4.17",
+    "wait-on": "^8.0.4"
+  },
+  "scripts": {
+    "react-start": "react-app-rewired start",
+    "react-build": "react-app-rewired build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "start": "tsc ./public/electron.ts && concurrently \"cross-env BROWSER=none npm run react-start\" \"wait-on http://localhost:3000 && electron .\"",
+    "build": "npm run react-build && electron-builder",
+    "build:mac": "npm run react-build && electron-builder --mac",
+    "build:win32": "npm run react-build && electron-builder --win --ia32",
+    "build:win64": " npm run react-build &&electron-builder --win --x64",
+    "release": "npm run react-build && electron-builder --publish=always",
+    "lint": "eslint './src**/*.{ts,tsx}'"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "build": {
+    "productName": "Instagram Crawler",
+    "appId": "com.instagramcrawler.electron",
+    "asar": true,
+    "files": [
+      "./backend/**/*",
+      "./node_modules/**/*",
+      "./package.json"
+    ],
+    "mac": {
+      "target": [
+        "default"
+      ],
+      "category": "public.app-category.utilities",
+      "icon": "build/icons/icon.icns"
+    },
+    "dmg": {
+      "title": "Instagram Crawler",
+      "icon": "build/icons/icon.icns"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "requestedExecutionLevel": "requireAdministrator",
+      "icon": "build/icons/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "perMachine": true,
+      "allowElevation": true,
+      "language": 1042,
+      "installerIcon": "build/icons/icon.ico",
+      "shortcutName": "Instagram Crawler",
+      "artifactName": "instagram-crawler-${version}.${ext}",
+      "uninstallDisplayName": "Instagram Crawler"
+    },
+    "directories": {
+      "buildResources": "./build/",
+      "output": "./dist/"
+    },
+    "extraResources": [
+      {
+        "from": "./backend/",
+        "to": "backend/",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ]
+  }
+}
