@@ -19,6 +19,7 @@ interface Props {
     menuBgColor?: string | null;
     menuWidth?: string;
     isScroll?: boolean;
+    isTextBold?: boolean;
 }
 
 export default function Dropdown({
@@ -35,6 +36,7 @@ export default function Dropdown({
     menuBgColor=null,
     menuWidth='w-56',
     isScroll=false,
+    isTextBold=false,
 }: Props): JSX.Element {
     const dropDownRef = useRef<HTMLDivElement | null>(null);
     const [dropdownActive, setDropdownActive] = useState<boolean>(false);
@@ -71,7 +73,11 @@ export default function Dropdown({
                         text-center
                         rounded-md
                         font-base
-                        font-semibold
+                        ${
+                            isTextBold ? 
+                            'font-semibold' : 
+                            'font-normal'
+                        }
                         ${
                             disabled ? 
                             `
