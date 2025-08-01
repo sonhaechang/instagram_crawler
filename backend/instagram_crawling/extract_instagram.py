@@ -336,7 +336,7 @@ class ExtractHander:
                 'channel': 'extract',
                 'data': {
                     'type': 'msg', 
-                    'data': f'총 게시글 url: {(post_urls_num - 1)}개 / 추출된 url: {extract_count}개  / 남은 url: {(post_urls_num - 1) - (extract_count - 1)}개'
+                    'data': f'총 게시글 url: {post_urls_num}개 / 추출된 url: {extract_count}개  / 남은 url: {post_urls_num - extract_count}개'
                 }
             })
 
@@ -376,7 +376,7 @@ class ExtractHander:
                     'channel': 'extract',
                     'data': {
                         'type': 'msg', 
-                        'data': f'{(extract_count)}번째 url 추출 중 / 총 게시글 url: {(post_urls_num - 1)}개 / 남은 url: {(post_urls_num - 1) - (extract_count - 1)}개'
+                        'data': f'{(extract_count + 1)}번째 url 추출 중 / 총 게시글 url: {post_urls_num}개 / 남은 url: {post_urls_num - extract_count}개'
                     }
                 })
 
