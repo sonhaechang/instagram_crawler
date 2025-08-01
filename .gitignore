@@ -1,3 +1,26 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+
+# misc
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
 # Created by https://www.toptal.com/developers/gitignore/api/django,macos,python,git,virtualenv,flask,linux
 # Edit at https://www.toptal.com/developers/gitignore?templates=django,macos,python,git,virtualenv,flask,linux
 
@@ -417,8 +440,6 @@ pip-selfcheck.json
 # End of https://www.toptal.com/developers/gitignore/api/django,macos,python,git,virtualenv,flask,linux
 
 secrets.json
-excel_result_files/*.xlsx
-excel_black_list/*.xlsx
-driver/chromedriver
-driver/*.zip
-test_date_list.py
+
+public/electron.js
+public/utils/socketManager.js

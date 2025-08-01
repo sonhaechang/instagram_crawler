@@ -3,7 +3,7 @@ import openpyxl
 
 from datetime import datetime 
 
-from instagram_crawling.meta_data import BASE_URL, EXCEL_DIR
+from instagram_crawling.meta_data import BASE_URL, CRAWLING_RESULT_DIR
 
 def add_value_in_excel_cell(sheet, num, val, key=None):
 	''' 해당 셀에 값 추가하는 함수 '''
@@ -21,7 +21,8 @@ def import_excel(file_path, import_type):
 		wb = openpyxl.load_workbook(file_path)
 
 		# sheet 선택
-		sheet = wb.get_sheet_by_name(import_type)
+		# get_sheet_by_name(import_type) // 해당 메소드는 더이상 사용하지 않음
+		sheet = wb[import_type]
 
 		# 엑셀 마지막 row 값 가져오기
 		max_row = sheet.max_row
@@ -60,14 +61,14 @@ def import_excel(file_path, import_type):
 	except (OSError, KeyError) as e:
 		return {}
 
-def export_excel(hash_tag, export_type, results, file_path=None):
+def export_excel(hashtag, export_type, results, file_path=None):
 	''' 결과값을 액셀로 저장하는 함수 '''
 
 	wb = None
 
 	date = datetime.today().strftime('%Y%m%d')
-	file_name = f'{hash_tag}_{date}.xlsx'
-	file_path = os.path.join(EXCEL_DIR, file_name) if file_path is None else file_path
+	file_name = f'{hashtag}_{date}.xlsx'
+	file_path = os.path.join(CRAWLING_RESULT_DIR, file_name) if file_path is None else file_path
 
 	# 게시글 url 저장할때
 	if export_type == 'post_url':
@@ -86,7 +87,7 @@ def export_excel(hash_tag, export_type, results, file_path=None):
 
 		# 결과를 엑셀 두번째 row부터 하나씩 저장 (url 주소)
 		for i, url in enumerate(results, start=2):
-			add_value_in_excel_cell(sheet, i, f'{BASE_URL}{url}')
+			add_value_in_excel_cell(sheet, i, url)
 
 	# 해쉬태그 결과 저장할때
 	elif export_type == 'tag_name':
@@ -100,7 +101,7 @@ def export_excel(hash_tag, export_type, results, file_path=None):
 		sheet.title = export_type
 
 		# 추출 결과 저장
-		sheet.cell(row=1, column=1).value = f'{hash_tag} 추출 결과: '
+		sheet.cell(row=1, column=1).value = f'{hashtag} 추출 결과: '
 		sheet.cell(row=1, column=2).value = len(results)
 
 		# 결과를 엑셀 두번째 row부터 하나씩 저장 (해쉬태그와 갯수 정보)
@@ -120,7 +121,8 @@ def update_excel(file_path, update_type, count, results=None):
 		wb = openpyxl.load_workbook(file_path)
 
 		# sheet 선택
-		sheet = wb.get_sheet_by_name(update_type)
+		# sheet = wb.get_sheet_by_name(update_type)
+		sheet = wb[update_type]
 
 		# 게시글 url 저장할때
 		if update_type == 'post_url':

@@ -1,5 +1,0 @@
-excel_black_list에는 해쉬태그 추출시 제외시킬 해쉬태그 목록을 저장합니다.
-
-black_list.xlsx라는 파일명으로 액셀을 생성하고 A column, 1 row 부터 아래로 제외시킬 해쉬태그를 입력해서 저장해주세요. EX) #해쉬태그 
-
-black_list.xlsx에 값이 있다면 해쉬태그 추출시 black_list.xlsx에 포함된 해쉬태그는 제외시키고 나머지 해쉬태그만 추출하여 저장합니다.
