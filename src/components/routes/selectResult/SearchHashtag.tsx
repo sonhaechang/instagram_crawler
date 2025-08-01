@@ -1,4 +1,4 @@
-import { Dispatch, JSX, SetStateAction } from 'react';
+import { Dispatch, JSX, SetStateAction, useEffect, useRef } from 'react';
 
 
 interface Props {
@@ -10,15 +10,25 @@ export default function SearchHashtag({
     hashtag,
     setHashtag
 }: Props): JSX.Element {
+    const inputRef = useRef<HTMLInputElement>(null);
+
     const onHandleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setHashtag(e.target.value)
-    }
+    };
+
+    useEffect(() => {
+        if (inputRef.current) {
+        inputRef.current.focus();
+        }
+    }, []);
 
     return (
         <div 
             className='
                 mt-5 
-                flex w-1/2
+                flex 
+                w-1/2
+                group 
             '
         >
             <div 
@@ -36,6 +46,12 @@ export default function SearchHashtag({
                     -outline-offset-1 
                     outline-gray-300 
                     sm:text-sm/6
+                    sibling 
+                    group-focus-within:outline 
+                    group-focus-within:outline-1 
+                    group-focus-within:-outline-offset-1 
+                    group-focus-within:outline-indigo-600 
+                    group-focus-within:text-indigo-600
                 '
             >
                 #
@@ -67,6 +83,7 @@ export default function SearchHashtag({
                     sm:text-sm/6
                 '
                 onChange={onHandleChange}
+                ref={inputRef}
             />
         </div>
     )
