@@ -10,6 +10,13 @@ from typing import Optional
 from bs4 import BeautifulSoup
 
 from seleniumwire import webdriver
+from selenium.common.exceptions import (
+    WebDriverException,
+    SessionNotCreatedException,
+    NoSuchDriverException,
+    TimeoutException,
+    InvalidArgumentException,
+)
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
@@ -104,13 +111,66 @@ def instagram_login(command_queue, response_queue) -> Driver:
 	try:
 		driver = Driver(profile_path)
 		driver.start(LOGIN_URL if is_first_login else BASE_URL)
-	except:
-		traceback.print_exc()
+	except NoSuchDriverException:
 		response_queue.put({
 			'status': 500, 
 			'channel': 'driverStart',
-			'data': '처리중 문제가 발생했습니다.\n 만약 실행중인 크롬 드라이버가 있다면 모두 닫고 다시 시도해주세요.',
+			'data': '[ERROR] 크롬 드라이버 파일(chromedriver.exe)을 찾을 수 없습니다. 경로를 확인해주세요.',
 		})
+		return None
+
+	except SessionNotCreatedException as e:
+		msg = str(e).lower()
+		if 'already in use' in msg:
+			response_queue.put({
+				'status': 500, 
+				'channel': 'driverStart',
+				'data': '[ERROR] 이미 실행 중인 크롬 또는 chromedriver 인스턴스와 충돌했습니다.\n 백그라운드의 chromedriver 프로세스를 종료한 뒤 다시 시도해주세요.',
+			})
+		else:
+			response_queue.put({
+				'status': 500, 
+				'channel': 'driverStart',
+				'data': '[ERROR] 크롬 실행 실패: 드라이버 버전이 크롬과 맞지 않거나 실행 파일에 문제가 있습니다.',
+			})
+		print(f'[DETAILS] {msg}')
+		return None
+
+	except InvalidArgumentException:
+		response_queue.put({
+			'status': 500, 
+			'channel': 'driverStart',
+			'data': '[ERROR] 옵션이나 binary_location 경로 설정이 잘못된 것 같습니다.',
+		})
+		return None
+
+	except TimeoutException:
+		response_queue.put({
+			'status': 500, 
+			'channel': 'driverStart',
+			'data': '[ERROR] 크롬 브라우저가 제한 시간 내에 실행되지 않았습니다. 시스템 리소스를 확인해주세요.',
+		})
+		return None
+
+	except WebDriverException as e:
+		msg = str(e).lower()
+		# if 'devtoolsactiveport' in msg or 'chrome not reachable' in msg:
+		response_queue.put({
+			'status': 500, 
+			'channel': 'driverStart',
+			'data': '[ERROR] WebDriver 관련 오류가 발생했습니다.',
+		})
+		print(f'[DETAILS] {e}')
+		return None
+
+	except Exception as e:
+		response_queue.put({
+			'status': 500, 
+			'channel': 'driverStart',
+			'data': '[ERROR] 알 수 없는 예외가 발생했습니다.',
+		})
+		print(f'[DETAILS] {e}')
+		traceback.print_exc()
 		return None
 
 	while True:
