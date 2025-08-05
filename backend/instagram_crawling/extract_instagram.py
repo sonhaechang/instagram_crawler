@@ -364,9 +364,13 @@ class ExtractHander:
                 return False
 
             post_count = 0
+            is_running = True
 
             # 마지막으로 추출한 게시글 url 있으면 다음꺼부터 이어서 해쉬태그 추출 아니면 처음부터
-            for url in post_urls[extract_count:]:
+            # for url in post_urls[extract_count:]:
+            while is_running:
+                post_url = post_urls[extract_count]
+
                 if self._stop_signal:
                     self._stop_response()
                     break
@@ -391,110 +395,150 @@ class ExtractHander:
                 tag_dict = dict()
 
                 # 해당 url에 게시글 상세 페이지 읽어오기
-                self.driver.get(url)
+                self.driver.get(post_url)
+                loading_time = time.time()
+                timeout_count = 0
 
                 # 200 정상 응답이 오면 해쉬태그 추출해서 리스트에 추가
                 if self.driver.requests[0].response.status_code == 200:
-                    scroll_to_get_all_comments(self.driver)
-                    click_all_show_replies_btns(self.driver)
+                    while True:
+                        try:
+                            scroll_to_get_all_comments(self.driver)
+                            click_all_show_replies_btns(self.driver)
 
-                    html = self.driver.page_source
-                    soup = bs(html, 'html.parser')
+                            html = self.driver.page_source
+                            soup = bs(html, 'html.parser')
 
-                    if is_instagram_blocked(html, soup):
-                        self.response_queue.put({
-                            'status': 400, 
-                            'channel': 'extract',
-                            'data': {
-                                'type': 'msg', 
-                                'data': '인스타그램 차단됨 - 잠시 후 다시 시도해주세요.\n 문제가 지속된다면 개발자에게 문의해주세요.'
-                            }
-                        })
+                            if is_instagram_blocked(html, soup):
+                                self.response_queue.put({
+                                    'status': 400, 
+                                    'channel': 'extract',
+                                    'data': {
+                                        'type': 'msg', 
+                                        'data': '인스타그램 차단됨 - 잠시 후 다시 시도해주세요.\n 문제가 지속된다면 개발자에게 문의해주세요.'
+                                    }
+                                })
 
-                        time.sleep(0.1)
+                                time.sleep(0.1)
 
-                        self.response_queue.put({
-                            'status': 200, 
-                            'channel': 'extract',
-                            'data': {
-                                'type': 'is_extract_finish', 
-                                'data': True
-                            }
-                        })
+                                self.response_queue.put({
+                                    'status': 200, 
+                                    'channel': 'extract',
+                                    'data': {
+                                        'type': 'is_extract_finish', 
+                                        'data': True
+                                    }
+                                })
 
-                        return False
+                                is_running = False
+                                return False
 
-                    tag_results = [a.get_text(strip=True) for a in soup.select(HASH_TAG_TITLE_TAG)]
-                    joined_tags = ' '.join(tag_results)
-                    pure_tags = list(re.findall('#[A-Za-z0-9가-힣]+', joined_tags))
-                    filtered_tags = filter_hashtags(pure_tags, self.black_list)
+                            tag_results = [a.get_text(strip=True) for a in soup.select(HASH_TAG_TITLE_TAG)]
+                            joined_tags = ' '.join(tag_results)
+                            pure_tags = list(re.findall('#[A-Za-z0-9가-힣]+', joined_tags))
+                            filtered_tags = filter_hashtags(pure_tags, self.black_list)
 
-                    # tag_list += list(filter(check_black_list, re.findall('#[A-Za-z0-9가-힣]+', joined_tag)))
-                    tag_list += filtered_tags
+                            # tag_list += list(filter(check_black_list, re.findall('#[A-Za-z0-9가-힣]+', joined_tag)))
+                            tag_list += filtered_tags
 
-                    self.response_queue.put({
-                        'status': 200, 
-                        'channel': 'extract',
-                        'data': {
-                            'type': 'msg', 
-                            'data': f'{len(pure_tags)}개의 해시태그를 수집'
-                        }
-                    })
+                            self.response_queue.put({
+                                'status': 200, 
+                                'channel': 'extract',
+                                'data': {
+                                    'type': 'msg', 
+                                    'data': f'{len(pure_tags)}개의 해시태그를 수집'
+                                }
+                            })
 
-                    extract_count += 1
-                    post_count += 1
+                            extract_count += 1
+                            post_count += 1
 
-                    # 게시글 url 엑셀 파일에 태그 추출 횃수 업데이트
-                    update_excel(file_path, 'post_url', extract_count)
+                            # 게시글 url 엑셀 파일에 태그 추출 횃수 업데이트
+                            update_excel(file_path, 'post_url', extract_count)
 
-                    # 해쉬태그 결과 엑셀 파일에서 내용 읽어오기
-                    _excel_result = import_excel(file_path, 'tag_name')
+                            # 해쉬태그 결과 엑셀 파일에서 내용 읽어오기
+                            _excel_result = import_excel(file_path, 'tag_name')
 
-                    # 엑셀 파일 있을시 (기존 해쉬태그 결과 엑셀 파일이 존재할떄)
-                    if bool(_excel_result):
-                        _tag_result = _excel_result['results']
+                            # 엑셀 파일 있을시 (기존 해쉬태그 결과 엑셀 파일이 존재할떄)
+                            if bool(_excel_result):
+                                _tag_result = _excel_result['results']
 
-                        # 기존 해쉬태그 결과 추가하기
-                        tag_dict.update(_tag_result)
+                                # 기존 해쉬태그 결과 추가하기
+                                tag_dict.update(_tag_result)
 
-                        # 해쉬태그 중복 카운트
-                        duplicate_count(tag_list, tag_dict)
+                                # 해쉬태그 중복 카운트
+                                duplicate_count(tag_list, tag_dict)
 
-                        # 엑셀에 결과 업데이트
-                        update_excel(file_path, 'tag_name', len(tag_dict), tag_dict)
+                                # 엑셀에 결과 업데이트
+                                update_excel(file_path, 'tag_name', len(tag_dict), tag_dict)
 
-                    # 엑셀 파일 없을시
-                    else:
-                        # 해쉬태그 중복 카운트
-                        duplicate_count(tag_list, tag_dict)
+                            # 엑셀 파일 없을시
+                            else:
+                                # 해쉬태그 중복 카운트
+                                duplicate_count(tag_list, tag_dict)
 
-                        # 결과 엑셀로 생성
-                        export_excel(hash_tag, 'tag_name', tag_dict, file_path)
+                                # 결과 엑셀로 생성
+                                export_excel(hash_tag, 'tag_name', tag_dict, file_path)
 
-                    # pbar.update(1)
+                            # pbar.update(1)
 
-                    if post_count >= int(ectract):
-                        self.response_queue.put({
-                            'status': 200, 
-                            'channel': 'extract',
-                            'data': {
-                                'type': 'msg', 
-                                'data': f'인스타그램 봇 차단 방지를 위해서 게시글 {ectract}개 까지만 확인합니다.'
-                            }
-                        })
+                            if int(post_urls_num) == extract_count:
+                                is_running = False
+                                break
 
-                        time.sleep(0.1)
+                            if post_count >= int(ectract):
+                                self.response_queue.put({
+                                    'status': 200, 
+                                    'channel': 'extract',
+                                    'data': {
+                                        'type': 'msg', 
+                                        'data': f'인스타그램 봇 차단 방지를 위해서 게시글 {ectract}개 까지만 확인합니다.'
+                                    }
+                                })
 
-                        self.response_queue.put({
-                            'status': 200, 
-                            'channel': 'extract',
-                            'data': {
-                                'type': 'is_extract_finish', 
-                                'data': True
-                            }
-                        })
+                                time.sleep(0.1)
 
-                        break
+                                self.response_queue.put({
+                                    'status': 200, 
+                                    'channel': 'extract',
+                                    'data': {
+                                        'type': 'is_extract_finish', 
+                                        'data': True
+                                    }
+                                })
+
+                                is_running = False
+                                break
+                            break
+                        except:
+                            pass
+
+                        # 3. 타임아웃 기준 초과 시
+                        if time.time() - loading_time > 60:
+                            timeout_count += 1
+
+                            if timeout_count >= 5:
+                                self.response_queue.put({
+                                    'status': 200, 
+                                    'channel': 'extract',
+                                    'data': {
+                                        'type': 'is_extract_finish', 
+                                        'data': f'[TIMEOUT] {60}초 동안 게시물 추출 실패, 지금 페이지를 새로고침 후 다시 시도합니다.'
+                                    }
+                                })
+                                self.driver.refresh()
+                                continue
+                            else:
+                                self.response_queue.put({
+                                    'status': 200, 
+                                    'channel': 'extract',
+                                    'data': {
+                                        'type': 'is_extract_finish', 
+                                        'data': f'[TIMEOUT] {60}초 동안 게시물 추출 실패'
+                                    }
+                                })
+                                is_running = False
+                                break
                 else:
                     # 정상 응답이 아니면 extract_error 변수값 True려 변경 후 for문 종료
                     self.response_queue.put({
@@ -517,6 +561,7 @@ class ExtractHander:
                         }
                     })
 
+                    is_running = False
                     break
 
             self.response_queue.put({
